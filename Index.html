@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Gentle Note</title>
+
+<style>
+:root{
+  --bg1:#fff7f3;
+  --bg2:#f4f7ff;
+  --card:#ffffff;
+  --primary:#ff8fa3;
+  --primary-dark:#ff6f8a;
+  --text:#2b2e4a;
+  --border:#f1dfe6;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:"Segoe UI",Tahoma,Arial,sans-serif;
+  background:linear-gradient(135deg,var(--bg1),var(--bg2));
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.wrapper{
+  width:100%;
+  max-width:640px;
+  padding:20px;
+}
+
+.card{
+  background:var(--card);
+  border-radius:28px;
+  padding:42px 36px;
+  box-shadow:0 30px 60px rgba(0,0,0,0.08);
+  border:1px solid var(--border);
+  min-height:460px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:34px;
+  position:relative;
+}
+
+/* صندوق الكلام */
+.text-box{
+  border:1.5px solid var(--border);
+  border-radius:22px;
+  padding:36px 30px;
+  text-align:center;
+}
+
+.text{
+  font-size:19px;
+  line-height:2.2;
+  white-space:pre-line;
+  color:var(--text);
+}
+
+/* القلب */
+.heart{
+  font-size:72px;
+  margin-top:22px;
+  animation:pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes pulse{
+  0%{transform:scale(1);opacity:.9}
+  50%{transform:scale(1.2);opacity:1}
+  100%{transform:scale(1);opacity:.9}
+}
+
+/* الازرار */
+.actions{
+  display:flex;
+  justify-content:center;
+  gap:18px;
+  flex-wrap:wrap;
+  position:relative;
+}
+
+button{
+  border:none;
+  padding:15px 38px;
+  border-radius:999px;
+  font-size:15px;
+  cursor:pointer;
+  transition:transform .15s ease;
+}
+
+.primary{
+  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+  color:#fff;
+  box-shadow:0 10px 26px rgba(255,143,163,0.35);
+}
+
+.primary:hover{
+  transform:translateY(-2px);
+}
+
+.secondary{
+  background:#fff;
+  border:1px solid var(--border);
+  color:#777;
+  position:absolute;
+}
+
+@media(max-width:480px){
+  .card{padding:30px 24px;min-height:420px}
+  .text{font-size:18px}
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrapper">
+  <div class="card" id="card">
+    <div class="text-box">
+      <div id="content" class="text"></div>
+      <div id="heart" class="heart" style="display:none">🤍</div>
+    </div>
+
+    <div class="actions" id="actions">
+      <!-- الازرار بتتحقن هنا -->
+    </div>
+  </div>
+</div>
+
+<script>
+const screens = [
+`دي تجربة صغيرة
+احيانا بنلاحظ حاجات حلوة في ناس
+ومش بنعرف نقولها مباشرة
+والتجربة دي محاولة بسيطة`,
+
+`على فكرة
+مفيش اختبار
+ومفيش تقييم
+ومفيش اي حاجة مطلوبة منك`,
+
+`في ناس وجودها بيغير الجو من غير ما تحاول
+
+انتي من الناس دي
+وده شيء يستحق يتقال ليكي`,
+
+`انتي شاطرة يا اميرة
+ومن اشطر الناس اللي اشتغلت معاهم
+ودايما بتعملي اللي عليكي
+واكتر`,
+
+`You Are Exceptional, Extraordinary, and Amazing 
+你像月亮 很温柔
+`,
+
+`دايما بشوفك متشجعة
+فى اي مرحلة من مراحل شغلك
+
+وده مش سهل
+ولا شئ عادي`,
+
+`اللي بيميزك
+مش بس الشغل
+
+لكن طريقتك
+وهدوئك 
+`,
+
+`في ضغط
+وفي ايام تقيلة
+
+بس وجودك
+بيخلي الامور ابسط
+واهدى`,
+
+`حبيت اقول ده
+من غير مناسبة
+ومن غير مقدمات كبيرة
+
+علشان انتى تستاهلى تعرفى ده`,
+
+`وجودك بيفرق فى اى مكان 
+ووجودك فارق معايا
+
+ربنا يديم وجودك`
+];
+
+let step = 0;
+
+const content = document.getElementById("content");
+const actions = document.getElementById("actions");
+const heart = document.getElementById("heart");
+const card = document.getElementById("card");
+
+let noBtn;
+
+function render(){
+  content.textContent = screens[step];
+  actions.innerHTML = "";
+  heart.style.display = (step === 4) ? "block" : "none";
+
+  if(step === 0){
+    const yes = document.createElement("button");
+    yes.className = "primary";
+    yes.textContent = "يلا نكمل";
+    yes.onclick = next;
+
+    noBtn = document.createElement("button");
+    noBtn.className = "secondary";
+    noBtn.textContent = "لا هفكر";
+
+    // مكان ابتدائي طبيعي
+    noBtn.style.left = "50%";
+    noBtn.style.top = "70%";
+    noBtn.style.transform = "translateX(-50%)";
+
+    enableEscape(noBtn);
+
+    actions.appendChild(yes);
+    actions.appendChild(noBtn);
+  }
+  else if(step < screens.length - 1){
+    const nextBtn = document.createElement("button");
+    nextBtn.className = "primary";
+    nextBtn.textContent = "Next";
+    nextBtn.onclick = next;
+    actions.appendChild(nextBtn);
+  }
+}
+
+function next(){
+  step++;
+  render();
+}
+
+function enableEscape(btn){
+  function runAway(){
+    const rect = card.getBoundingClientRect();
+    const bw = btn.offsetWidth;
+    const bh = btn.offsetHeight;
+
+    const x = Math.random()*(rect.width - bw - 20);
+    const y = Math.random()*(rect.height - bh - 20);
+
+    btn.style.left = x + "px";
+    btn.style.top  = y + "px";
+  }
+
+  btn.addEventListener("mouseenter", runAway);
+  btn.addEventListener("mousemove", runAway);
+  btn.addEventListener("touchstart", e=>{
+    e.preventDefault();
+    runAway();
+  });
+}
+
+render();
+</script>
+
+</body>
+</html>
